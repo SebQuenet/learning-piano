@@ -46,24 +46,36 @@ const App = () => {
   const randomGame = usePianoGame(midiEvent);
   const exercise = useExercise(
     mode === "exercise" ? exerciseData?.upper : [],
+    mode === "exercise" ? exerciseData?.lower : [],
     midiEvent
   );
 
   // Use sound hook
   useMIDISound(midiEvent, midiSoundsRef);
 
-  // Get current note based on mode
-  const getCurrentNote = () => {
+  // Get current notes based on mode
+  const getCurrentNotes = () => {
     if (mode === "random") {
-      return randomGame.currentNote;
-    } else if (mode === "exercise" && exercise.currentNote) {
-      // Find matching note from NOTES constant for positioning
-      return NOTES.find(n => n.midiNumber === exercise.currentNote.midiNumber) || null;
+      return {
+        upper: randomGame.currentNote,
+        lower: null,
+      };
+    } else if (mode === "exercise") {
+      // Find matching notes from NOTES constant for positioning on staff
+      const upperNote = exercise.currentUpperNote
+        ? NOTES.find(n => n.midiNumber === exercise.currentUpperNote.midiNumber) || null
+        : null;
+
+      const lowerNote = exercise.currentLowerNote
+        ? NOTES.find(n => n.midiNumber === exercise.currentLowerNote.midiNumber) || null
+        : null;
+
+      return { upper: upperNote, lower: lowerNote };
     }
-    return null;
+    return { upper: null, lower: null };
   };
 
-  const currentNote = getCurrentNote();
+  const { upper: currentUpperNote, lower: currentLowerNote } = getCurrentNotes();
 
   return (
     <div>
@@ -115,15 +127,16 @@ const App = () => {
               onReset={exercise.resetExercise}
             />
             <NoteSequence
-              notes={exerciseData.upper}
+              upperNotes={exerciseData.upper}
+              lowerNotes={exerciseData.lower}
               currentIndex={exercise.currentIndex}
             />
           </>
         )
       )}
 
-      <Staff clef="treble" note={currentNote} />
-      <Staff clef="bass" />
+      <Staff clef="treble" note={currentUpperNote} />
+      <Staff clef="bass" note={currentLowerNote} />
     </div>
   );
 };
