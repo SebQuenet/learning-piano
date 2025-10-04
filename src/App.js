@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useRef, useReducer } from "react";
+import { useMIDI, useMIDINote } from "@react-midi/hooks";
+import MIDISounds from "midi-sounds-react";
 import "./App.css";
 import classes from "./App.module.scss";
 import Note0 from "./components/Note0";
@@ -18,65 +19,105 @@ import Notem2 from "./components/Notem2";
 // <div>𝄞♩♭♯𝄚</div>
 
 const listOfNotes = [
-  { component: Notem2, note: 'do' },
-  { component: Notem1, note: 'ré' },
-  { component: Note0, note: 'mi' },
-  { component: Note1, note: 'fa' },
-  { component: Note2, note: 'sol' },
-  { component: Note3, note: 'fa' },
-  { component: Note4, note: 'sol' },
-  { component: Note5, note: 'la' },
-  { component: Note6, note: 'si' },
-  { component: Note7, note: 'do' },
-  { component: Note8, note: 'ré' },
-  { component: Note9, note: 'mi' },
+  { component: Notem2, note: "do", noteNumber: 60 },
+  { component: Notem1, note: "ré", noteNumber: 62 },
+  { component: Note0, note: "mi", noteNumber: 64 },
+  { component: Note1, note: "fa", noteNumber: 65 },
+  { component: Note2, note: "sol", noteNumber: 67 },
+  { component: Note3, note: "la", noteNumber: 69 },
+  { component: Note4, note: "si", noteNumber: 71 },
+  { component: Note5, note: "do", noteNumber: 72 },
+  { component: Note6, note: "ré", noteNumber: 74 },
+  { component: Note7, note: "mi", noteNumber: 76 },
+  { component: Note8, note: "fa", noteNumber: 77 },
+  { component: Note9, note: "sol", noteNumber: 79 },
 ];
 
-const keysToNotes = {
-  q: 'do',
-  s: 'ré',
-  d: 'mi',
-  f: 'fa',
-  g: 'sol',
-  h: 'la',
-  j: 'si',
-  k: 'do',
-  l: 'ré',
-  m: 'mi'
-}
+const noteLevel = () => Math.floor(Math.random() * 12);
+
+const gameReducer = (state, action) => {
+  switch (action.type) {
+    case "startGame":
+      return "game/STARTED";
+    case "stopGame":
+      return "game/STOPPED";
+    default:
+      return "game/UNKNOWN";
+  }
+};
+
+const gameReducerInitialState = "game/NOT_STARTED";
 
 const App = () => {
-  const [keyPressed, setKeyPressed] = useState("");
-  useEffect(() => {
-    console.log("Document ok !");
-    document.addEventListener("keydown", (e) => {
-      setKeyPressed(e.key);
-    });
-  }, [keyPressed]);
+  const { inputs, outputs } = useMIDI();
+  const [selectedMidiId, setSelectedMidiId] = useState(inputs[0]?.id);
+  const [nextScaleIndex, setNextScaleIndex] = useState(noteLevel());
+  const [score, setScore] = useState(0);
+  const midiController = inputs.find((input) => input.id === selectedMidiId);
+  const [gameState, gameReducerDispatch] = useReducer(
+    gameReducer,
+    gameReducerInitialState
+  );
+  const event = useMIDINote(midiController);
+  const decreaseNum = () => setTimer((prev) => prev - 1);
+  const [timer, setTimer] = useState(3);
 
-  const number = Math.floor(Math.random() * 12);
-  let result;
-  if (keysToNotes[keyPressed] === listOfNotes[number].note) {
-    result = true;
-  } else {
-    result = false;
-  }
+  let midiSounds = useRef();
+  let intervalRef = useRef();
+
+  useEffect(() => {
+    intervalRef.current = setInterval(decreaseNum, 1000);
+
+    return () => clearInterval(intervalRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (timer === 0) {
+      clearInterval(intervalRef.current);
+    }
+  }, [timer]);
+  useEffect(() => {
+    if (!event?.on) return;
+    midiSounds.playChordNow(3, [event?.note], 2.5);
+    if (event.note === listOfNotes[nextScaleIndex]?.noteNumber) {
+      setScore(score + 1);
+    }
+    setNextScaleIndex(noteLevel());
+  }, [event]);
+
   return (
     <div>
+      <MIDISounds
+        ref={(ref) => (midiSounds = ref)}
+        appElementName="root"
+        instruments={[3]}
+      />
+      {timer}
+      <select
+        onChange={(e) => {
+          setSelectedMidiId(e.target.value);
+        }}
+      >
+        {inputs.map((input) => (
+          <option key={input.id} value={input.id}>
+            {input.name}
+          </option>
+        ))}
+      </select>
+      <p className={classes.score}>Score : {score}</p>
       <div className={classes.fiveLinesStaffWrapper}>
         <span className={classes.fiveLinesStaff}>
           𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚
         </span>
         <span className={classes.gClef}>𝄞</span>
-        {listOfNotes[number].component()}
+        {listOfNotes[nextScaleIndex].component()}
       </div>
-      {listOfNotes[number].note}
-      <br />
-      {keyPressed}
-      <br/>
-      {keysToNotes[keyPressed]}
-      <br />
-      { result.toString() }
+      <div className={classes.fiveLinesStaffWrapper}>
+        <span className={classes.fiveLinesStaff}>
+          𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚𝄚
+        </span>
+        <span className={classes.gClef}>𝄢</span>
+      </div>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 
 .fiveLinesStaffWrapper {
     margin: 2rem;
+    display: flex;
 }
 
 .fiveLinesStaff {
@@ -16,6 +17,15 @@
 .note {
     font-size: 4rem;
     position: relative;
+    left: 4rem;
+    top: 0.4rem;
+}
+
+.score {
+    font-size: 4rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
     left: 4rem;
     top: 0.4rem;
 }
