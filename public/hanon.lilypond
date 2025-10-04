@@ -1,0 +1,23 @@
+\version "2.24.0"
+\header { title = "Hanon No.1 (extrait)" composer = "C.L. Hanon" }
+\paper { #(set-paper-size "a4") }
+
+upper = \relative c' {
+  \tempo 4=60 \key c \major \time 4/4
+  \mf c8-1 d-2 e-3 f-4 g-5 f-4 e-3 d-2 |  % doigtés
+  c8\< d e f g a b c\!                  % crescendo/fin
+}
+lower = \relative c {
+  \clef bass \key c \major \time 4/4
+  c,8-5 e-3 g-1 g-1 g-1 g-1 g-1 g-1 |   % simple ostinato LH
+  c,8 e g g g g g g
+}
+
+\score {
+  \new PianoStaff <<
+    \new Staff = "RH" \with { instrumentName = "RH" } { \upper }
+    \new Staff = "LH" \with { instrumentName = "LH" \clef bass } { \lower }
+  >>
+  \layout {}
+  \midi {}
+}
