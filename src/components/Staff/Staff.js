@@ -36,21 +36,44 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
 
           if (!note) return null;
 
+          // Determine if note has sharp or flat
+          const hasSharp = note.id && note.id.includes('#');
+          const hasFlat = note.id && note.id.includes('b');
+          const accidental = hasSharp ? MUSIC_SYMBOLS.SHARP : hasFlat ? MUSIC_SYMBOLS.FLAT : null;
+
+          const baseLeft = 4 + (idx * 2);
+
           return (
-            <span
-              key={`${actualIndex}-${note.midiNumber}`}
-              className={`
-                ${classes.note}
-                ${isCurrent ? classes.current : ''}
-                ${isPast ? classes.past : ''}
-              `}
-              style={{
-                top: `${note.position}rem`,
-                left: `${4 + (idx * 2)}rem` // Spacing between notes
-              }}
-            >
-              {MUSIC_SYMBOLS.QUARTER_NOTE}
-            </span>
+            <React.Fragment key={`${actualIndex}-${note.midiNumber}`}>
+              {accidental && (
+                <span
+                  className={`
+                    ${classes.accidental}
+                    ${isCurrent ? classes.current : ''}
+                    ${isPast ? classes.past : ''}
+                  `}
+                  style={{
+                    top: `${note.position + 1.9}rem`, // Position lower, near the note head
+                    left: `${baseLeft - 0.3}rem` // Position to the left of the note
+                  }}
+                >
+                  {accidental}
+                </span>
+              )}
+              <span
+                className={`
+                  ${classes.note}
+                  ${isCurrent ? classes.current : ''}
+                  ${isPast ? classes.past : ''}
+                `}
+                style={{
+                  top: `${note.position}rem`,
+                  left: `${baseLeft}rem` // Spacing between notes
+                }}
+              >
+                {MUSIC_SYMBOLS.QUARTER_NOTE}
+              </span>
+            </React.Fragment>
           );
         })}
       </div>
