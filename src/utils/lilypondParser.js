@@ -37,9 +37,16 @@ export const lilypondNoteToMidi = (note, baseOctave = 4, previousMidi = 60) => {
   let midiNumber = NOTE_BASE_MIDI[baseNoteName];
   if (midiNumber === undefined) return null;
 
-  // Handle accidentals
-  if (cleanNote.includes('is')) midiNumber += 1; // sharp
-  if (cleanNote.includes('es') || cleanNote.includes('as')) midiNumber -= 1; // flat
+  // Handle accidentals and build display name
+  let displayName = baseNoteName.toUpperCase();
+  if (cleanNote.includes('is')) {
+    midiNumber += 1; // sharp
+    displayName += '#';
+  }
+  if (cleanNote.includes('es') || cleanNote.includes('as')) {
+    midiNumber -= 1; // flat
+    displayName += 'b';
+  }
 
   // Add base octave
   midiNumber += baseOctave * 12;
@@ -62,7 +69,7 @@ export const lilypondNoteToMidi = (note, baseOctave = 4, previousMidi = 60) => {
 
   return {
     midiNumber,
-    noteName: baseNoteName.toUpperCase(),
+    noteName: displayName,
   };
 };
 

@@ -33,6 +33,11 @@ const App = () => {
         const response = await fetch('/hanon.lilypond');
         const content = await response.text();
         const parsed = parseLilypondFile(content);
+        console.log('=== Parsed Exercise Data ===');
+        console.log(`Upper notes: ${parsed.upper?.length || 0}`);
+        console.log(`Lower notes: ${parsed.lower?.length || 0}`);
+        console.log('First 15 upper notes:', parsed.upper?.slice(0, 15));
+        console.log('First 15 lower notes:', parsed.lower?.slice(0, 15));
         setExerciseData(parsed);
       } catch (error) {
         console.error('Failed to load exercise file:', error);
@@ -43,15 +48,26 @@ const App = () => {
   }, []);
 
   // Use custom hooks based on mode
-  const randomGame = usePianoGame(midiEvent);
+  const randomGame = usePianoGame();
   const exercise = useExercise(
     mode === "exercise" ? exerciseData?.upper : [],
-    mode === "exercise" ? exerciseData?.lower : [],
-    midiEvent
+    mode === "exercise" ? exerciseData?.lower : []
   );
 
   // Use sound hook
   useMIDISound(midiEvent, midiSoundsRef);
+
+  // Handle MIDI events based on current mode
+  useEffect(() => {
+    if (!midiEvent?.on || !midiEvent?.note) return;
+
+    if (mode === "random") {
+      randomGame.checkNote(midiEvent.note);
+    } else if (mode === "exercise") {
+      exercise.checkNote(midiEvent.note);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [midiEvent, mode, randomGame.checkNote, exercise.checkNote]);
 
   // Map exercise notes to NOTES with positions for staff display
   const mapNotesToStaffPositions = (exerciseNotes) => {
