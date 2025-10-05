@@ -1,14 +1,44 @@
 .staffWrapper {
   margin: 2rem;
   display: flex;
+  position: relative;
+  min-height: 8rem;
+  overflow-x: auto;
 }
 
 .staffLines {
   font-size: 4rem;
   position: absolute;
+  pointer-events: none;
 }
 
 .clef {
   font-size: 4rem;
   position: absolute;
+  z-index: 1;
+}
+
+.notesContainer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.note {
+  font-size: 4rem;
+  position: absolute;
+  transition: all 0.3s ease;
+  color: #333;
+
+  &.current {
+    color: #ffc107;
+    transform: scale(1.3);
+    filter: drop-shadow(0 0 8px rgba(255, 193, 7, 0.8));
+    z-index: 10;
+  }
+
+  &.past {
+    color: #4caf50;
+    opacity: 0.6;
+  }
 }

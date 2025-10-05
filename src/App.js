@@ -53,29 +53,28 @@ const App = () => {
   // Use sound hook
   useMIDISound(midiEvent, midiSoundsRef);
 
-  // Get current notes based on mode
-  const getCurrentNotes = () => {
-    if (mode === "random") {
-      return {
-        upper: randomGame.currentNote,
-        lower: null,
-      };
-    } else if (mode === "exercise") {
-      // Find matching notes from NOTES constant for positioning on staff
-      const upperNote = exercise.currentUpperNote
-        ? NOTES.find(n => n.midiNumber === exercise.currentUpperNote.midiNumber) || null
-        : null;
-
-      const lowerNote = exercise.currentLowerNote
-        ? NOTES.find(n => n.midiNumber === exercise.currentLowerNote.midiNumber) || null
-        : null;
-
-      return { upper: upperNote, lower: lowerNote };
-    }
-    return { upper: null, lower: null };
+  // Map exercise notes to NOTES with positions for staff display
+  const mapNotesToStaffPositions = (exerciseNotes) => {
+    if (!exerciseNotes) return [];
+    return exerciseNotes.map(exerciseNote => {
+      const matchedNote = NOTES.find(n => n.midiNumber === exerciseNote.midiNumber);
+      return matchedNote || null;
+    }).filter(note => note !== null);
   };
 
-  const { upper: currentUpperNote, lower: currentLowerNote } = getCurrentNotes();
+  // Get note sequences for staff display
+  const upperNotesForStaff = mode === "exercise" && exerciseData
+    ? mapNotesToStaffPositions(exerciseData.upper)
+    : mode === "random" && randomGame.currentNote
+      ? [randomGame.currentNote]
+      : [];
+
+  const lowerNotesForStaff = mode === "exercise" && exerciseData
+    ? mapNotesToStaffPositions(exerciseData.lower)
+    : [];
+
+  // Get current index based on mode
+  const currentNoteIndex = mode === "exercise" ? exercise.currentIndex : 0;
 
   return (
     <div>
@@ -135,8 +134,18 @@ const App = () => {
         )
       )}
 
-      <Staff clef="treble" note={currentUpperNote} />
-      <Staff clef="bass" note={currentLowerNote} />
+      <Staff
+        clef="treble"
+        notes={upperNotesForStaff}
+        currentIndex={currentNoteIndex}
+        displayCount={16}
+      />
+      <Staff
+        clef="bass"
+        notes={lowerNotesForStaff}
+        currentIndex={currentNoteIndex}
+        displayCount={16}
+      />
     </div>
   );
 };
