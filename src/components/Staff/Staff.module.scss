@@ -1,5 +1,4 @@
 .staffWrapper {
-  margin: 2rem;
   display: flex;
   position: relative;
   min-height: 8rem;
@@ -65,4 +64,29 @@
   position: absolute;
   color: #333;
   z-index: 0;
+}
+
+.timeSignature {
+  font-size: 1.5rem;
+  position: absolute;
+  color: #333;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.tempo {
+  font-size: 0.9rem;
+  position: absolute;
+  color: #333;
+  font-style: italic;
+  z-index: 2;
+}
+
+.dynamic {
+  font-size: 1.2rem;
+  position: absolute;
+  color: #333;
+  font-style: italic;
+  font-weight: bold;
+  z-index: 2;
 }

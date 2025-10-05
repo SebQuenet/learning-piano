@@ -28,6 +28,20 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
       <span className={classes.staffLines}>{staffLines}</span>
       <span className={classes.clef}>{clefSymbol}</span>
 
+      {/* Time signature 2/4 - only show on treble clef */}
+      {clef === 'treble' && (
+        <>
+          <span className={classes.timeSignature} style={{ left: '2.5rem', top: '0.4rem' }}>2</span>
+          <span className={classes.timeSignature} style={{ left: '2.5rem', top: '1.2rem' }}>4</span>
+
+          {/* Tempo marking */}
+          <span className={classes.tempo} style={{ left: '0rem', top: '-2.5rem' }}>♩ = 60-108</span>
+        </>
+      )}
+
+      {/* Dynamic marking mf - show on both staves */}
+      <span className={classes.dynamic} style={{ left: '3.5rem', top: clef === 'treble' ? '3rem' : '-1.5rem' }}>mf</span>
+
       <div className={classes.notesContainer}>
         {visibleNotes.map((note, idx) => {
           const actualIndex = startIndex + idx;
@@ -88,7 +102,7 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
                   left: `${baseLeft}rem` // Spacing between notes
                 }}
               >
-                {MUSIC_SYMBOLS.QUARTER_NOTE}
+                {MUSIC_SYMBOLS.SIXTEENTH_NOTE}
               </span>
             </React.Fragment>
           );

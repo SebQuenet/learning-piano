@@ -72,6 +72,10 @@ export const MUSIC_SYMBOLS = {
   BASS_CLEF: '𝄢',
   STAFF_LINE: '𝄚',
   QUARTER_NOTE: '♩',
+  SIXTEENTH_NOTE: '𝅘𝅥𝅯',
   SHARP: '♯',
   FLAT: '♭',
+  TIME_SIG_2: '𝄁',
+  TIME_SIG_4: '𝄀',
+  BRACE: '𝄔',
 };

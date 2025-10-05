@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useMIDI, useMIDINote } from "@react-midi/hooks";
 import MIDISounds from "midi-sounds-react";
 import "./App.css";
-import { MIDI_CONFIG } from "./constants/notes";
+import { MIDI_CONFIG, MUSIC_SYMBOLS } from "./constants/notes";
 import { NOTES } from "./constants/notes";
 import { usePianoGame } from "./hooks/usePianoGame";
 import { useExercise } from "./hooks/useExercise";
@@ -150,18 +150,23 @@ const App = () => {
         )
       )}
 
-      <Staff
-        clef="treble"
-        notes={upperNotesForStaff}
-        currentIndex={currentNoteIndex}
-        displayCount={16}
-      />
-      <Staff
-        clef="bass"
-        notes={lowerNotesForStaff}
-        currentIndex={currentNoteIndex}
-        displayCount={16}
-      />
+      <div className={classes.staffSystem}>
+        <div className={classes.bracket}>{MUSIC_SYMBOLS.BRACE}</div>
+        <div className={classes.staves}>
+          <Staff
+            clef="treble"
+            notes={upperNotesForStaff}
+            currentIndex={currentNoteIndex}
+            displayCount={16}
+          />
+          <Staff
+            clef="bass"
+            notes={lowerNotesForStaff}
+            currentIndex={currentNoteIndex}
+            displayCount={16}
+          />
+        </div>
+      </div>
     </div>
   );
 };
