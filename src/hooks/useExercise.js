@@ -19,6 +19,29 @@ export const useExercise = (upperSequence, lowerSequence, midiEvent) => {
   const totalNotes = Math.max(upperSequence?.length || 0, lowerSequence?.length || 0);
   const progress = totalNotes > 0 ? ((currentIndex / totalNotes) * 100).toFixed(0) : 0;
 
+  // Check if both hands have been played and advance to next note
+  useEffect(() => {
+    if (isComplete) return;
+
+    const bothHandsPlayed = (playedNotes.has('upper') || !currentUpperNote) &&
+                            (playedNotes.has('lower') || !currentLowerNote);
+
+    if (bothHandsPlayed && playedNotes.size > 0) {
+      // Move to next note pair after a short delay
+      const timer = setTimeout(() => {
+        if (currentIndex < totalNotes - 1) {
+          setCurrentIndex((prev) => prev + 1);
+          setPlayedNotes(new Set()); // Reset for next pair
+        } else {
+          setIsComplete(true);
+          setPlayedNotes(new Set());
+        }
+      }, 100); // Small delay to ensure UI updates
+
+      return () => clearTimeout(timer);
+    }
+  }, [playedNotes, currentUpperNote, currentLowerNote, currentIndex, totalNotes, isComplete]);
+
   const checkNote = useCallback((playedMidiNumber) => {
     if (isComplete) return false;
 
@@ -28,26 +51,11 @@ export const useExercise = (upperSequence, lowerSequence, midiEvent) => {
     if (upperMatch || lowerMatch) {
       const handKey = upperMatch ? 'upper' : 'lower';
 
-      // Update played notes and check completion
+      // Only add if not already played
       setPlayedNotes((prev) => {
+        if (prev.has(handKey)) return prev; // Already played this hand
         const newSet = new Set(prev);
         newSet.add(handKey);
-
-        // Check if both hands have been played (or if only one hand has a note)
-        const bothHandsPlayed = (newSet.has('upper') || !currentUpperNote) &&
-                                (newSet.has('lower') || !currentLowerNote);
-
-        if (bothHandsPlayed) {
-          // Move to next note pair
-          if (currentIndex < totalNotes - 1) {
-            setCurrentIndex((prev) => prev + 1);
-            return new Set(); // Reset for next pair
-          } else {
-            setIsComplete(true);
-            return new Set();
-          }
-        }
-
         return newSet;
       });
 
@@ -58,7 +66,7 @@ export const useExercise = (upperSequence, lowerSequence, midiEvent) => {
       setErrors((prev) => prev + 1);
       return false;
     }
-  }, [currentUpperNote, currentLowerNote, currentIndex, totalNotes, isComplete]);
+  }, [currentUpperNote, currentLowerNote, isComplete]);
 
   const resetExercise = useCallback(() => {
     setCurrentIndex(0);
