@@ -43,8 +43,25 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
 
           const baseLeft = 4 + (idx * 2);
 
+          // Determine if note needs a ledger line
+          // For treble clef: C4 (middle C) and below need ledger lines
+          // For bass clef: C4 (middle C) and above need ledger lines
+          const needsLedgerLine = (clef === 'treble' && note.position >= 1.2) ||
+                                   (clef === 'bass' && note.position <= -1.6);
+
           return (
             <React.Fragment key={`${actualIndex}-${note.midiNumber}`}>
+              {needsLedgerLine && (
+                <span
+                  className={classes.ledgerLine}
+                  style={{
+                    top: `${note.position + 2.1}rem`,
+                    left: `${baseLeft + 0.1}rem`
+                  }}
+                >
+                  ─
+                </span>
+              )}
               {accidental && (
                 <span
                   className={`
