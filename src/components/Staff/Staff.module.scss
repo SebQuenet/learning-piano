@@ -2,7 +2,7 @@
   display: flex;
   position: relative;
   min-height: 8rem;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .staffLines {
@@ -67,10 +67,11 @@
 }
 
 .timeSignature {
-  font-size: 1.5rem;
+  font-size: 2.3rem;
   position: absolute;
   color: #333;
-  font-weight: bold;
+  font-weight: normal;
+  font-family: "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
   z-index: 2;
 }
 

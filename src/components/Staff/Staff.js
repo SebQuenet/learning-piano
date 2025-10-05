@@ -15,8 +15,8 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
     ? MUSIC_SYMBOLS.TREBLE_CLEF
     : MUSIC_SYMBOLS.BASS_CLEF;
 
-  // Repeat staff line symbol for visual effect
-  const staffLines = MUSIC_SYMBOLS.STAFF_LINE.repeat(60);
+  // Repeat staff line symbol based on displayCount to avoid unnecessary scrollbars
+  const staffLines = MUSIC_SYMBOLS.STAFF_LINE.repeat(displayCount + 6);
 
   // Calculate which notes to display (window around current note)
   const startIndex = Math.max(0, currentIndex - 2);
@@ -31,8 +31,8 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
       {/* Time signature 2/4 - only show on treble clef */}
       {clef === 'treble' && (
         <>
-          <span className={classes.timeSignature} style={{ left: '2.5rem', top: '0.4rem' }}>2</span>
-          <span className={classes.timeSignature} style={{ left: '2.5rem', top: '1.2rem' }}>4</span>
+          <span className={classes.timeSignature} style={{ left: '2.5rem', top: '0.1rem' }}>2</span>
+          <span className={classes.timeSignature} style={{ left: '2.5rem', top: '1.6rem' }}>4</span>
 
           {/* Tempo marking */}
           <span className={classes.tempo} style={{ left: '0rem', top: '-2.5rem' }}>♩ = 60-108</span>
@@ -40,7 +40,7 @@ const Staff = ({ clef = 'treble', notes = [], currentIndex = 0, displayCount = 1
       )}
 
       {/* Dynamic marking mf - show on both staves */}
-      <span className={classes.dynamic} style={{ left: '3.5rem', top: clef === 'treble' ? '3rem' : '-1.5rem' }}>mf</span>
+      <span className={classes.dynamic} style={{ left: '3.5rem', top: clef === 'treble' ? '-1.2rem' : '4.5rem' }}>mf</span>
 
       <div className={classes.notesContainer}>
         {visibleNotes.map((note, idx) => {
